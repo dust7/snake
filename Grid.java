@@ -35,6 +35,15 @@ class Grid {
         this.squaresy=cloneme.squaresy;
     }
     
+    public boolean deadzonePoint(Point pt) {
+        for(int i=0; i<deadzone.size(); i++) {
+            if(pt.equals(deadzone.get(i))) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
     public int getDeadzoneSize() {
         return deadzone.size();
     }

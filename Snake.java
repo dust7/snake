@@ -6,7 +6,7 @@ class Snake {
     private Point head; //must always be at parts(0)
     private Point prevTailPos; //saves tail position before last move
     private ArrayList<Point> parts;
-    private String lastMoved="";
+    private int lastMoved=-1; //0: up, 1: down, 2:left, 3: right
     private Color headColor=new Color(2,157,16); //default headcolor
     private Color bodyColor=Color.green; //default bodycolor
     
@@ -27,7 +27,7 @@ class Snake {
         this.head=new Point(cloneme.head);
         this.prevTailPos=new Point(cloneme.prevTailPos);
         this.parts=new ArrayList<Point>(cloneme.parts);
-        this.lastMoved=new String(cloneme.lastMoved);
+        this.lastMoved=cloneme.getLastMoved();
         this.headColor=new Color(cloneme.headColor.getRed(),cloneme.headColor.getGreen(),
                                  cloneme.headColor.getBlue());
         this.bodyColor=new Color(cloneme.bodyColor.getRed(),cloneme.bodyColor.getGreen(),
@@ -48,7 +48,7 @@ class Snake {
         parts.add(0,new Point((int)head.getX(),(int)head.getY()-Grid.SIDE));          
         head=parts.get(0);
         parts.remove(parts.size()-1);    
-        lastMoved="up";
+        lastMoved=0;
     }
     
     public void moveDown() {
@@ -56,7 +56,7 @@ class Snake {
         parts.add(0,new Point((int)head.getX(),(int)head.getY()+Grid.SIDE));
         head=parts.get(0);
         parts.remove(parts.size()-1); 
-        lastMoved="down";
+        lastMoved=1;
     }    
     
     public void moveLeft() {
@@ -64,7 +64,7 @@ class Snake {
         parts.add(0,new Point((int)head.getX()-Grid.SIDE,(int)head.getY()));
         head=parts.get(0);
         parts.remove(parts.size()-1);
-        lastMoved="left";
+        lastMoved=2;
     }
     
     public void moveRight() {
@@ -72,16 +72,25 @@ class Snake {
         parts.add(0,new Point((int)head.getX()+Grid.SIDE,(int)head.getY()));
         head=parts.get(0);
         parts.remove(parts.size()-1);
-        lastMoved="right";
+        lastMoved=3;
     }
     
-    public String getLastMoved() {
+    public int getLastMoved() {
         return lastMoved;
     }
     
     public boolean bites() {
         for(int i=1; i<parts.size(); i++) {
             if(head.equals(parts.get(i))) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public boolean pointBites(Point pt) {
+        for(int i=1; i<parts.size(); i++) {
+            if(pt.equals(parts.get(i))) {
                 return true;
             }
         }
