@@ -5,7 +5,7 @@ import java.awt.Color;
 class Food {
     private Point foodPosition=new Point();
     private Random rand=new Random();
-    private Color foodColor=new Color(255,20,147); //default Color    
+    private Color foodColor=new Color(255,20,147);    
     
     public Food(Grid grid) {
         jump(grid);        

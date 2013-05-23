@@ -6,11 +6,11 @@ class SnakeFrame extends JFrame implements WindowListener, KeyListener {
     private static final int EXTRA_X=10; //because JFrame is a bitch   
     private static final int EXTRA_Y=32;
     
-    private Color bg=Color.white; //default background
+    private Color bg=new Color(215, 215, 215);
     private int lastListened=-1; //last user input, 0: up, 1: down, 2:left, 3: right    
     
     public SnakeFrame(int userx, int usery) {
-        super(userx+" x "+usery);        
+        super(userx+"x"+usery);        
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setResizable(false);        
         addWindowListener(this);            
@@ -30,7 +30,7 @@ class SnakeFrame extends JFrame implements WindowListener, KeyListener {
         return new Color(bg.getRed(), bg.getGreen(), bg.getBlue());
     }
 
-    private void refresh() {
+    public void refresh() {
         SnakePainter.paintDeadzone(this,SnakeGame.getGrid());
         SnakePainter.paintPlayzone(this,SnakeGame.getGrid());
         SnakePainter.repaintWholeSnake(this,SnakeGame.getTroll());
@@ -52,13 +52,13 @@ class SnakeFrame extends JFrame implements WindowListener, KeyListener {
 
     public void keyPressed(KeyEvent evt) {
         int keyCode=evt.getKeyCode();
-        if(keyCode==37) {
+        if(keyCode==37) { //left arrow
             lastListened=2;
-        } else if(keyCode==38) {
+        } else if(keyCode==38) { //up arrow
             lastListened=0;
-        } else if(keyCode==39) {
+        } else if(keyCode==39) { //right arrow
             lastListened=3;
-        } else if(keyCode==40) {
+        } else if(keyCode==40) { //down arrow
             lastListened=1;
         }            
     }

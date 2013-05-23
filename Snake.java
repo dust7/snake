@@ -3,12 +3,12 @@ import java.util.ArrayList;
 import java.awt.Color;
 
 class Snake {
-    private Point head; //must always be at parts(0)
+    private Point head; //is always parts(0)
     private Point prevTailPos; //saves tail position before last move
     private ArrayList<Point> parts;
     private int lastMoved=-1; //0: up, 1: down, 2:left, 3: right
-    private Color headColor=new Color(2,157,16); //default headcolor
-    private Color bodyColor=Color.green; //default bodycolor
+    private Color headColor=new Color(2,157,16); 
+    private Color bodyColor=Color.green; 
     
     public Snake(Grid grid) {
         //place head centrally
@@ -43,36 +43,23 @@ class Snake {
         return false;
     }
     
-    public void moveUp() {
-        prevTailPos=new Point(parts.get(parts.size()-1));        
-        parts.add(0,new Point((int)head.getX(),(int)head.getY()-Grid.SIDE));          
+    public void move(int i) { //0: up, 1: down, 2:left, 3: right        
+        prevTailPos=new Point(parts.get(parts.size()-1));
+        if(i==0) {
+            parts.add(0,new Point((int)head.getX(),(int)head.getY()-Grid.SIDE));
+            lastMoved=0;
+        } else if(i==1) {
+            parts.add(0,new Point((int)head.getX(),(int)head.getY()+Grid.SIDE));
+            lastMoved=1;
+        } else if(i==2) {
+            parts.add(0,new Point((int)head.getX()-Grid.SIDE,(int)head.getY()));
+            lastMoved=2;
+        } else if(i==3) {
+            parts.add(0,new Point((int)head.getX()+Grid.SIDE,(int)head.getY()));
+            lastMoved=3;
+        }
         head=parts.get(0);
-        parts.remove(parts.size()-1);    
-        lastMoved=0;
-    }
-    
-    public void moveDown() {
-        prevTailPos=new Point(parts.get(parts.size()-1));               
-        parts.add(0,new Point((int)head.getX(),(int)head.getY()+Grid.SIDE));
-        head=parts.get(0);
-        parts.remove(parts.size()-1); 
-        lastMoved=1;
-    }    
-    
-    public void moveLeft() {
-        prevTailPos=new Point(parts.get(parts.size()-1));               
-        parts.add(0,new Point((int)head.getX()-Grid.SIDE,(int)head.getY()));
-        head=parts.get(0);
-        parts.remove(parts.size()-1);
-        lastMoved=2;
-    }
-    
-    public void moveRight() {
-        prevTailPos=new Point(parts.get(parts.size()-1));                
-        parts.add(0,new Point((int)head.getX()+Grid.SIDE,(int)head.getY()));
-        head=parts.get(0);
-        parts.remove(parts.size()-1);
-        lastMoved=3;
+        parts.remove(parts.size()-1);           
     }
     
     public int getLastMoved() {

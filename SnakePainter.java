@@ -54,7 +54,8 @@ class SnakePainter {
     }   
  
     public static void repaintSnake(JFrame frame, Snake snake, Food food) {
-        if(!snake.eats(food) && !food.getFoodPosition().equals(snake.getPrevTailPos())) {
+        if(!snake.eats(food) && !food.getFoodPosition().equals(snake.getPrevTailPos())
+           && (snake instanceof TrollSnake || !SnakeGame.prevTailOnTroll())) {
             fillSq(frame, snake.getPrevTailPos(), ((SnakeFrame)frame).getBg(), -1);           
         }
         if(snake.getSize()>=2) { //repaint previous head to body color            

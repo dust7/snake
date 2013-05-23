@@ -8,23 +8,34 @@ class TrollSnake extends Snake {
     
     public TrollSnake(Grid grid) {
         super(grid);
+        this.setHeadColor(new Color(255,96,0));
+        this.setBodyColor(new Color(255,215,0));        
+        replace(grid);        
+    }
+    
+    private void replace(Grid grid) {
         int quartsqx=grid.getSQX()/4;
         int quartsqy=grid.getSQY()/4;
-        for(int i=1; i<=quartsqx; i++) {
-            moveLeft();
-        }
-        boolean rb=rand.nextBoolean();           
+        boolean rb=rand.nextBoolean();
         if(rb) {
-            for(int i=1; i<rand.nextInt(quartsqx); i++) {
-                moveUp();
+            for(int i=1; i<=rand.nextInt(quartsqx)+2; i++) { 
+                move(2); //left
+            }          
+        } else {
+            for(int i=1; i<=rand.nextInt(quartsqx)+2; i++) {
+                move(3); //right
+            }
+        }        
+        rb=rand.nextBoolean();           
+        if(rb) {
+            for(int i=1; i<rand.nextInt(quartsqy)+2; i++) {
+                move(0); //up
             }
         } else {
-            for(int i=1; i<rand.nextInt(quartsqx); i++) {
-                moveDown();
+            for(int i=1; i<rand.nextInt(quartsqy)+2; i++) {
+                move(1); //down
             }
         }
-        this.setHeadColor(new Color(255,96,0));
-        this.setBodyColor(new Color(255,215,0));
     }
     
     private boolean[] evalMove(Grid grid, int where) {
@@ -46,18 +57,6 @@ class TrollSnake extends Snake {
         return eval;
     }
     
-    private void move(int i) {
-        if(i==0) {
-            moveUp();            
-        } else if(i==1) {
-            moveDown();            
-        } else if(i==2) {
-            moveLeft();            
-        } else if(i==3) {
-            moveRight();            
-        }
-    }
-    
     public void randMove(Grid grid) {
         boolean moved=false;
         boolean testedLast=false;              
@@ -71,7 +70,7 @@ class TrollSnake extends Snake {
         }        
         
         while(directions.size()>=1 && !moved) {            
-            if(!testedLast && rn!=0) { //90% chance to try last last move first
+            if(!testedLast && rn!=0) { //90% chance to first try last move again
                 chosen=getLastMoved();
                 testedLast=true;                
             } else {            
