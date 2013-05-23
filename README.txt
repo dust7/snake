@@ -12,3 +12,6 @@ v1.0
 v1.1
 - enemy snake
 - turbo mode
+
+v1.2
+- food stolen or player bitten: next command inverted

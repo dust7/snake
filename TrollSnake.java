@@ -38,6 +38,15 @@ class TrollSnake extends Snake {
         }
     }
     
+    public boolean bites(Snake snake) {        
+        for(int i=0; i<snake.getSize(); i++) {
+            if(getPartsElement(0).equals(snake.getPartsElement(i))) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
     private boolean[] evalMove(Grid grid, int where) {
         int headx=(int)getPartsElement(0).getX();
         int heady=(int)getPartsElement(0).getY();

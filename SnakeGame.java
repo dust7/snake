@@ -10,6 +10,7 @@ class SnakeGame {
     private static Food food;
     private static Grid grid;
     private static int time=150; //time/ms between moves
+    private static boolean trolled=false;
     private static Random rand=new Random();
     private static long startTime=System.currentTimeMillis();
     private static Runtime rt = Runtime.getRuntime();
@@ -60,6 +61,22 @@ class SnakeGame {
             }
         }
         return bitestroll || snake.bites() || snake.isInDeadzone(grid);
+    }
+    
+    private static void playerMove(int command) {
+        if(!trolled) {
+            snake.move(command);
+            return;
+        } else if(command==0) {
+            snake.move(1);            
+        } else if(command==1) {
+            snake.move(0);
+        } else if(command==2) {
+            snake.move(3);
+        } else if(command==3) {
+            snake.move(2);
+        }
+        trolled=false;
     }
     
     //methods for debugging (format grid locations, print info)
@@ -123,22 +140,25 @@ class SnakeGame {
         //start game        
         inform();                
         while(!gameOver()) {            
-            int command=frame.getLastListened();
+            int command=frame.getLastListened(); //0: up, 1: down, 2:left, 3: right
             int lastMoved=snake.getLastMoved();
-            if(command==0 && lastMoved!=1) { //0: up, 1: down, 2:left, 3: right
-                snake.move(0);                            
-            } else if(command==1 && lastMoved!=0){
-                snake.move(1);                
-            } else if(command==2 && lastMoved!=3) {
-                snake.move(2);                   
-            } else if(command==3 && lastMoved!=2) {
-                snake.move(3);                    
+            if(command==0 && lastMoved!=1 && command!=lastMoved) { 
+                playerMove(0);                            
+            } else if(command==1 && lastMoved!=0 && command!=lastMoved){
+                playerMove(1);                
+            } else if(command==2 && lastMoved!=3 && command!=lastMoved) {
+                playerMove(2);                   
+            } else if(command==3 && lastMoved!=2 && command!=lastMoved) {
+                playerMove(3);                    
             } else if(lastMoved!=-1) {                               
                 snake.move(lastMoved);
-            } 
+            }                
             if(lastMoved!=-1) {
-                ((TrollSnake)troll).randMove(grid);
-            }        
+                ((TrollSnake)troll).randMove(grid);                
+            }
+            if(troll.eats(food) || ((TrollSnake)troll).bites(snake)) {
+                trolled=true;
+            }            
             if(snake.eats(food) || troll.eats(food)) {
                 adjustTime();
                 troll.grow();
@@ -163,7 +183,7 @@ class SnakeGame {
                 Thread.sleep(time);
             } catch (InterruptedException ex) {}           
         }
-        //game over
+        //game over       
         snake.setHeadColor(Color.red);
         SnakePainter.repaintSnake(frame,snake,food);           
         ScoreBoard score=new ScoreBoard(frame, snake.getSize());            
