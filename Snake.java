@@ -75,6 +75,15 @@ class Snake {
         return false;
     }
     
+    public boolean bites(Snake snake) {        
+        for(int i=0; i<snake.getSize(); i++) {
+            if(getPartsElement(0).equals(snake.getPartsElement(i))) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
     public boolean pointBites(Point pt) {
         for(int i=1; i<parts.size(); i++) {
             if(pt.equals(parts.get(i))) {

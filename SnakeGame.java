@@ -52,15 +52,8 @@ class SnakeGame {
         return false;
     }
     
-    private static boolean gameOver() {
-        boolean bitestroll=false;
-        for(int i=0; i<troll.getSize(); i++) {
-            if(snake.getPartsElement(0).equals(troll.getPartsElement(i))) {
-                bitestroll=true;
-                break;
-            }
-        }
-        return bitestroll || snake.bites() || snake.isInDeadzone(grid);
+    private static boolean gameOver() {        
+        return snake.bites(troll) || snake.bites() || snake.isInDeadzone(grid);
     }
     
     private static void playerMove(int command) {
@@ -156,7 +149,7 @@ class SnakeGame {
             if(lastMoved!=-1) {
                 ((TrollSnake)troll).randMove(grid);                
             }
-            if(troll.eats(food) || ((TrollSnake)troll).bites(snake)) {
+            if(troll.eats(food) || troll.bites(snake)) {
                 trolled=true;
             }            
             if(snake.eats(food) || troll.eats(food)) {
