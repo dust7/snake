@@ -3,8 +3,7 @@ import java.awt.event.*;
 import javax.swing.*;
 
 class AskFrame extends JFrame implements ActionListener, KeyListener {
-    private static boolean isInitialized=false;
-    
+    private boolean isInitialized=false;    
     private JTextField textx, texty;
     private JButton play;
     private JCheckBox checkBox;

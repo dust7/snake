@@ -4,16 +4,17 @@ import java.awt.Point;
 import javax.swing.*;
 import java.util.Random;
 
-class SnakeGame {
+class SnakeGame {    
     private static Snake snake; //snake, troll, food, grid used to refresh() frame
     private static Snake troll;
     private static Food food;
     private static Grid grid;
     private static int time=150; //time/ms between moves
     private static boolean trolled=false;
-    private static Random rand=new Random();
-    private static long startTime=System.currentTimeMillis();
-    private static Runtime rt = Runtime.getRuntime();
+    private static Random rand=new Random(); 
+    //restart relevant:
+    private static AskFrame askuser;
+    private static boolean sameRestart=false; //game restarted with same settings?    
 
     public static Snake getSnake() {
         return new Snake(snake);
@@ -54,6 +55,11 @@ class SnakeGame {
     
     private static boolean gameOver() {        
         return snake.bites(troll) || snake.bites() || snake.isInDeadzone(grid);
+    }
+    
+    private static boolean win() { //grid full?
+        return (grid.getSQX()-2)*(grid.getSQY()-2)-troll.getSize()
+                                                 ==snake.getSize();
     }
     
     private static void playerMove(int command) {
@@ -97,88 +103,103 @@ class SnakeGame {
         System.out.println("snake size: "+snake.getSize());
         System.out.println("head at: "+normLocOut(snake.getPartsElement(0)));    
         System.out.println("food at: "+normLocOut(food.getFoodPosition()));  
-        System.out.println("time: "+time+" ms");              
-        System.out.println("runtime: "+(System.currentTimeMillis()-startTime)/1000+" s");        
-        System.out.println("JVM total/free memory: "+rt.totalMemory()+" "+rt.freeMemory()+"\n");
+        System.out.println("time: "+time+" ms");        
+    }
+    
+    public static void setSameRestart(boolean set) {
+        sameRestart=set;
     }
     
     public static void main(String[] args) {
-        //ask user for playzone dimensions and game mode
-        AskFrame askuser=new AskFrame();
-        while(!askuser.isInitialized()) {
-            try {
-                Thread.sleep(100);                
-            } catch(InterruptedException ex){}
-        }            
-        askuser.setVisible(false);
-        askuser.dispose();        
-        //init grid, snake, food, frame                           
-        grid=new Grid(askuser.getUserX(), askuser.getUserY());        
-        snake=new Snake(grid);        
-        troll=new TrollSnake(grid);            
-        food=new Food(grid);
-        while(food.isOnSnake(snake) || food.isOnSnake(troll)) {
-            food.jump(grid);
-        }       
-        SnakeFrame frame=new SnakeFrame(askuser.getUserX(), askuser.getUserY());               
-        if(askuser.getTurbo()) {
-            time=25;
-            frame.setTitle(askuser.getUserX()+"x"+askuser.getUserX()+" T");    
-        }
-        //prevent painting bugs on startup, give frame time to load0
-        try {
-            Thread.sleep(100);
-        } catch(InterruptedException ex) {}
-        frame.refresh();    
-        //start game        
-        inform();                
-        while(!gameOver()) {            
-            int command=frame.getLastListened(); //0: up, 1: down, 2:left, 3: right
-            int lastMoved=snake.getLastMoved();
-            if(command==0 && lastMoved!=1 && command!=lastMoved) { 
-                playerMove(0);                            
-            } else if(command==1 && lastMoved!=0 && command!=lastMoved){
-                playerMove(1);                
-            } else if(command==2 && lastMoved!=3 && command!=lastMoved) {
-                playerMove(2);                   
-            } else if(command==3 && lastMoved!=2 && command!=lastMoved) {
-                playerMove(3);                    
-            } else if(lastMoved!=-1) {                               
-                snake.move(lastMoved);
-            }                
-            if(lastMoved!=-1) {
-                ((TrollSnake)troll).randMove(grid);                
+        while(true) { //ScoreBoard handles restart/exit (user input)
+            //ask user for playzone dimensions and game mode
+            if(!sameRestart) {
+                askuser=new AskFrame();
+                while(!askuser.isInitialized()) {
+                    try {
+                        Thread.sleep(100);                
+                    } catch(InterruptedException ex){}
+                }            
+            askuser.setVisible(false);
+            askuser.dispose();
+            }        
+            //init grid, snake, food, frame                           
+            grid=new Grid(askuser.getUserX(), askuser.getUserY());        
+            snake=new Snake(grid);        
+            troll=new TrollSnake(grid);            
+            food=new Food(grid);
+            while(food.isOnSnake(snake) || food.isOnSnake(troll)) {
+                food.jump(grid);
+            }       
+            SnakeFrame frame=new SnakeFrame(askuser.getUserX(), askuser.getUserY());               
+            if(askuser.getTurbo()) {
+                time=25;
+                frame.setTitle(askuser.getUserX()+"x"+askuser.getUserX()+" T");    
             }
-            if(troll.eats(food) || troll.bites(snake)) {
-                trolled=true;
-            }            
-            if(snake.eats(food) || troll.eats(food)) {
-                adjustTime();
-                troll.grow();
-                snake.grow();                
-                SnakePainter.repaintWholeSnake(frame,troll);                                 
-                SnakePainter.repaintSnake(frame,troll,food);                        
-                SnakePainter.repaintSnake(frame,snake,food);                
-                boolean win=(askuser.getUserX()*askuser.getUserY()-troll.getSize()
-                             <=snake.getSize());    
-                while(!win && (food.isOnSnake(snake) || food.isOnSnake(troll))) {
-                    food.jump(grid);
+            //prevent painting bugs on startup, give frame time to load0
+            try {
+                Thread.sleep(100);
+            } catch(InterruptedException ex) {}
+            frame.refresh();    
+            //start game        
+            inform();                
+            while(!gameOver() && !win()) {            
+                int command=frame.getLastListened(); //0: up, 1: down, 2:left, 3: right
+                int lastMoved=snake.getLastMoved();
+                if(command==0 && lastMoved!=1 && command!=lastMoved) { 
+                    playerMove(0);                            
+                } else if(command==1 && lastMoved!=0 && command!=lastMoved){
+                    playerMove(1);                
+                } else if(command==2 && lastMoved!=3 && command!=lastMoved) {
+                    playerMove(2);                   
+                } else if(command==3 && lastMoved!=2 && command!=lastMoved) {
+                    playerMove(3);                    
+                } else if(lastMoved!=-1) {                               
+                    snake.move(lastMoved);
+                }                
+                if(lastMoved!=-1) {
+                    ((TrollSnake)troll).randMove(grid);                
                 }
-                SnakePainter.repaintFood(frame,food);    
-                inform();
-            } else {
-                SnakePainter.repaintWholeSnake(frame,troll);                                
-                SnakePainter.repaintSnake(frame,troll,food);
-                SnakePainter.repaintSnake(frame,snake,food);
+                if(troll.eats(food) || troll.bites(snake)) {
+                    trolled=true;
+                }            
+                if(snake.eats(food) || troll.eats(food)) {
+                    adjustTime();
+                    troll.grow();
+                    snake.grow();                
+                    SnakePainter.repaintWholeSnake(frame,troll);                                 
+                    SnakePainter.repaintSnake(frame,troll,food);                        
+                    SnakePainter.repaintSnake(frame,snake,food);                      
+                    while(!win() && (food.isOnSnake(snake) || food.isOnSnake(troll))) {
+                        food.jump(grid);
+                    }
+                    SnakePainter.repaintFood(frame,food);    
+                    inform();
+                } else {
+                    SnakePainter.repaintWholeSnake(frame,troll);                                
+                    SnakePainter.repaintSnake(frame,troll,food);
+                    SnakePainter.repaintSnake(frame,snake,food);
+                }
+                //limit gamespeed
+                try {
+                    Thread.sleep(time);
+                } catch (InterruptedException ex) {}           
             }
-            //limit gamespeed
-            try {
-                Thread.sleep(time);
-            } catch (InterruptedException ex) {}           
-        }
-        //game over       
-        snake.setHeadColor(Color.red);
-        SnakePainter.repaintSnake(frame,snake,food);           
-        ScoreBoard score=new ScoreBoard(frame, snake.getSize());            
+            //game over       
+            snake.setHeadColor(Color.red);
+            SnakePainter.repaintSnake(frame,snake,food);           
+            ScoreBoard score=new ScoreBoard(frame, snake.getSize());
+            //prepare restart
+            time=150;
+            trolled=false;            
+            frame.setVisible(false);
+            frame.dispose();
+            while(!score.isFinished()) { //wait for decision to exit or restart
+                try {
+                    Thread.sleep(100);                
+                } catch(InterruptedException ex){}
+            }
+            score=null;    
+        } 
     }
 }
