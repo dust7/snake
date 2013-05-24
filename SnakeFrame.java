@@ -12,7 +12,7 @@ class SnakeFrame extends JFrame implements WindowListener, KeyListener {
     public SnakeFrame(int userx, int usery) {
         super(userx+"x"+usery);        
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setResizable(false);        
+        setResizable(false);                
         addWindowListener(this);            
         addKeyListener(this);            
         setSize((userx+2)*Grid.SIDE+EXTRA_X,(usery+2)*Grid.SIDE+EXTRA_Y);        

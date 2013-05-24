@@ -13,7 +13,11 @@ class ScoreBoard extends JDialog implements ActionListener {
         setLayout(new FlowLayout());
         setLocationRelativeTo(frame);
         //g/o group
+        if(SnakeGame.win()) {
+        add(new JLabel("YOU WIN!"));
+        } else {
         add(new JLabel("GAME OVER"));
+        }
         add(new JLabel("Snake Size: "+score));        
         //exit group
         JButton exit=new JButton("EXIT");
@@ -42,18 +46,15 @@ class ScoreBoard extends JDialog implements ActionListener {
     public void actionPerformed(ActionEvent evt) {
         String command=evt.getActionCommand();
         if(command.equals("EXIT")) {
-            System.exit(0);
-        } else if(command.equals("old")) {
-            isFinished=true;
+            SnakeGame.setPlayAgain(false);           
+        } else if(command.equals("old")) {            
             SnakeGame.setSameRestart(true);
-            setVisible(false);
-            dispose();
-        } else if(command.equals("new")) {
-            isFinished=true;
-            SnakeGame.setSameRestart(false);
-            setVisible(false);
-            dispose();
-        }     
+        } else if(command.equals("new")) {            
+            SnakeGame.setSameRestart(false);            
+        }
+        setVisible(false);
+        dispose();
+        isFinished=true;    
     }
     
     public boolean isFinished() {

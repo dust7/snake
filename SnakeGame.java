@@ -14,7 +14,8 @@ class SnakeGame {
     private static Random rand=new Random(); 
     //restart relevant:
     private static AskFrame askuser;
-    private static boolean sameRestart=false; //game restarted with same settings?    
+    private static boolean sameRestart=false; //game restarted with same settings?
+    private static boolean playAgain=true;    
 
     public static Snake getSnake() {
         return new Snake(snake);
@@ -30,6 +31,10 @@ class SnakeGame {
     
     public static Grid getGrid() {
         return new Grid(grid);
+    }
+
+    public static void setPlayAgain(boolean set) {
+        playAgain=set;
     }    
     
     private static void adjustTime() {    
@@ -57,7 +62,7 @@ class SnakeGame {
         return snake.bites(troll) || snake.bites() || snake.isInDeadzone(grid);
     }
     
-    private static boolean win() { //grid full?
+    public static boolean win() { //grid full?
         return (grid.getSQX()-2)*(grid.getSQY()-2)-troll.getSize()
                                                  ==snake.getSize();
     }
@@ -76,31 +81,22 @@ class SnakeGame {
             snake.move(2);
         }
         trolled=false;
-    }
+        snake.setHeadColor(new Color(2,157,16));
+    }    
     
-    //methods for debugging (format grid locations, print info)
-    private static int normXout(int x) {        
-        x=x-Grid.SIDE-Grid.SIDE/2-Grid.OFFSET_X;
-        x=x/Grid.SIDE;
-        return x;
-    }
-    
-    private static int normYout(int y) {        
-        y=y-Grid.SIDE-Grid.SIDE/2-Grid.OFFSET_Y;
-        y=y/Grid.SIDE;
-        return y;
-    }
-    
+    //debugging methods
     private static String normLocOut(Point pt) {
         int x=(int)pt.getX();
         int y=(int)pt.getY();
-        x=normXout(x);
-        y=normYout(y);
+        x=x-Grid.SIDE-Grid.SIDE/2-Grid.OFFSET_X;
+        x=x/Grid.SIDE;
+        y=y-Grid.SIDE-Grid.SIDE/2-Grid.OFFSET_Y;
+        y=y/Grid.SIDE;
         return "("+x+","+y+")";
     }
     
     public static void inform() {
-        System.out.println("snake size: "+snake.getSize());
+        System.out.println("\nsnake size: "+snake.getSize());
         System.out.println("head at: "+normLocOut(snake.getPartsElement(0)));    
         System.out.println("food at: "+normLocOut(food.getFoodPosition()));  
         System.out.println("time: "+time+" ms");        
@@ -111,7 +107,7 @@ class SnakeGame {
     }
     
     public static void main(String[] args) {
-        while(true) { //ScoreBoard handles restart/exit (user input)
+        while(playAgain) { //ScoreBoard handles restart/exit (user input)
             //ask user for playzone dimensions and game mode
             if(!sameRestart) {
                 askuser=new AskFrame();
@@ -131,7 +127,8 @@ class SnakeGame {
             while(food.isOnSnake(snake) || food.isOnSnake(troll)) {
                 food.jump(grid);
             }       
-            SnakeFrame frame=new SnakeFrame(askuser.getUserX(), askuser.getUserY());               
+            SnakeFrame frame=new SnakeFrame(askuser.getUserX(), askuser.getUserY());
+            frame.setLocationRelativeTo(askuser);     
             if(askuser.getTurbo()) {
                 time=25;
                 frame.setTitle(askuser.getUserX()+"x"+askuser.getUserX()+" T");    
@@ -143,7 +140,8 @@ class SnakeGame {
             frame.refresh();    
             //start game        
             inform();                
-            while(!gameOver() && !win()) {            
+            while(!gameOver() && !win()) {
+                //move
                 int command=frame.getLastListened(); //0: up, 1: down, 2:left, 3: right
                 int lastMoved=snake.getLastMoved();
                 if(command==0 && lastMoved!=1 && command!=lastMoved) { 
@@ -160,9 +158,13 @@ class SnakeGame {
                 if(lastMoved!=-1) {
                     ((TrollSnake)troll).randMove(grid);                
                 }
-                if(troll.eats(food) || troll.bites(snake)) {
-                    trolled=true;
-                }            
+                //trolled?
+                if((troll.eats(food) || troll.bites(snake))
+                    && !snake.getPartsElement(0).equals(troll.getPartsElement(0))) {
+                    trolled=true;                    
+                    snake.setHeadColor(new Color(106,90,205));
+                }
+                //food eaten?    
                 if(snake.eats(food) || troll.eats(food)) {
                     adjustTime();
                     troll.grow();
@@ -200,6 +202,7 @@ class SnakeGame {
                 } catch(InterruptedException ex){}
             }
             score=null;    
-        } 
+        }        
+        System.exit(0);    
     }
 }

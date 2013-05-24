@@ -16,7 +16,8 @@ class AskFrame extends JFrame implements ActionListener, KeyListener {
         setLayout(new FlowLayout());
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(205,140);
-        setResizable(false); 
+        setResizable(false);
+        setLocationRelativeTo(null);    
         //add components    
         promptx=new JLabel("Squares x (10-150):");
         add(promptx);
@@ -40,7 +41,8 @@ class AskFrame extends JFrame implements ActionListener, KeyListener {
         play.addActionListener(this);
         UIManager.put("Button.defaultButtonFollowsFocus", Boolean.TRUE);//buttons resp.
                                                                         //to enter
-        setVisible(true);           
+        setVisible(true);
+        
     }
     
     public void actionPerformed(ActionEvent evt) { 
