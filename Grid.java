@@ -8,6 +8,7 @@ class Grid {
     
     private ArrayList<Point> playzone;
     private ArrayList<Point> deadzone;    
+    private ArrayList<Point> border;    
     private int squaresx;
     private int squaresy;
     
@@ -16,6 +17,7 @@ class Grid {
         squaresy=usery+2;
         playzone=new ArrayList<Point>(squaresx*squaresy);
         deadzone=new ArrayList<Point>(2*squaresx+2*squaresy-4);
+        border=new ArrayList<Point>(2*userx+2*usery-4);
         for(int row=0; row<squaresy; row++) {
             for(int col=0; col<squaresx; col++) {
                 Point nextcenter=new Point(SIDE/2+col*SIDE+OFFSET_X,SIDE/2+row*SIDE+OFFSET_Y);                              
@@ -23,9 +25,12 @@ class Grid {
                     deadzone.add(nextcenter);
                 } else {
                     playzone.add(nextcenter);
+                    if(row==1 || col==1 || row==squaresy-2 || col==squaresx-2) {
+                        border.add(nextcenter);
+                    }
                 }                
             }
-        }
+        }        
     }
     
     public Grid(Grid cloneme) {
@@ -41,6 +46,15 @@ class Grid {
                 return true;
             }
         }
+        return false;
+    }
+    
+    public boolean borderPoint(Point pt) {
+        for(int i=0; i<border.size(); i++) {
+            if(pt.equals(border.get(i))) {
+                return true;
+            }
+        }        
         return false;
     }
     

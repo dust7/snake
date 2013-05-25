@@ -82,6 +82,10 @@ class SnakeGame {
         }
         trolled=false;
         snake.setHeadColor(new Color(2,157,16));
+    }
+    
+    public static void setSameRestart(boolean set) {
+        sameRestart=set;
     }    
     
     //debugging methods
@@ -100,10 +104,6 @@ class SnakeGame {
         System.out.println("head at: "+normLocOut(snake.getPartsElement(0)));    
         System.out.println("food at: "+normLocOut(food.getFoodPosition()));  
         System.out.println("time: "+time+" ms");        
-    }
-    
-    public static void setSameRestart(boolean set) {
-        sameRestart=set;
     }
     
     public static void main(String[] args) {
@@ -133,20 +133,19 @@ class SnakeGame {
                 time=25;
                 frame.setTitle(askuser.getUserX()+"x"+askuser.getUserX()+" T");    
             }
-            //prevent painting bugs on startup, give frame time to load0
+            //prevent painting bugs on startup, give frame time to load
             try {
                 Thread.sleep(100);
             } catch(InterruptedException ex) {}
             frame.refresh();    
-            //start game        
-            inform();                
+            //start game                           
             while(!gameOver() && !win()) {
                 //move
                 int command=frame.getLastListened(); //0: up, 1: down, 2:left, 3: right
                 int lastMoved=snake.getLastMoved();
                 if(command==0 && lastMoved!=1 && command!=lastMoved) { 
                     playerMove(0);                            
-                } else if(command==1 && lastMoved!=0 && command!=lastMoved){
+                } else if(command==1 && lastMoved!=0 && command!=lastMoved) {
                     playerMove(1);                
                 } else if(command==2 && lastMoved!=3 && command!=lastMoved) {
                     playerMove(2);                   
@@ -154,13 +153,12 @@ class SnakeGame {
                     playerMove(3);                    
                 } else if(lastMoved!=-1) {                               
                     snake.move(lastMoved);
-                }                
+                }                  
                 if(lastMoved!=-1) {
                     ((TrollSnake)troll).randMove(grid);                
                 }
                 //trolled?
-                if((troll.eats(food) || troll.bites(snake))
-                    && !snake.getPartsElement(0).equals(troll.getPartsElement(0))) {
+                if((troll.eats(food) || troll.bites(snake)) && !snake.bites(troll)) {
                     trolled=true;                    
                     snake.setHeadColor(new Color(106,90,205));
                 }
@@ -175,8 +173,7 @@ class SnakeGame {
                     while(!win() && (food.isOnSnake(snake) || food.isOnSnake(troll))) {
                         food.jump(grid);
                     }
-                    SnakePainter.repaintFood(frame,food);    
-                    inform();
+                    SnakePainter.repaintFood(frame,food);
                 } else {
                     SnakePainter.repaintWholeSnake(frame,troll);                                
                     SnakePainter.repaintSnake(frame,troll,food);
